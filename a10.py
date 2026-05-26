@@ -129,6 +129,7 @@ def get_birth_date(name: str) -> str:
         birth date of the given person
     """
     infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    print(infobox_text)
     pattern = r"(?:Born\D*)(?P<birth>\d{4}-\d{2}-\d{2})"
     error_text = (
         "Page infobox has no birth information (at least none in xxxx-xx-xx format)"
@@ -157,9 +158,31 @@ def get_death_date(name: str) -> str:
 
     return match.group("death")
 
+def get_capital(name: str) -> str:
+
+    infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    pattern = r"(?:Capital)(?P<Capital>\w*?)(?:\d)"
+    error_text = (
+        "Page infobox has no capitol information"
+    )
+    match = get_match(infobox_text, pattern, error_text)
+
+    return match.group("capital")
+
 # below are a set of actions. Each takes a list argument and returns a list of answers
 # according to the action and the argument. It is important that each function returns a
 # list of the answer(s) and not just the answer itself.
+
+def capital(matches: List[str]) -> List[str]:
+    """Returns birth date of named person in matches
+
+    Args:
+        matches - match from pattern of person's name to find birth date of
+
+    Returns:
+        birth date of named person
+    """
+    return [get_capital(" ".join(matches))]
 
 
 def birth_date(matches: List[str]) -> List[str]:
@@ -213,6 +236,7 @@ Action = Callable[[List[str]], List[Any]]
 pa_list: List[Tuple[Pattern, Action]] = [
     ("when was % born".split(), birth_date),
     ("what is the polar radius of %".split(), polar_radius),
+    ("what is the capital of %".split(), capital),
     (["bye"], bye_action),
 ]
 
